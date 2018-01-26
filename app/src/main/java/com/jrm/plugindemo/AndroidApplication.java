@@ -44,18 +44,18 @@ public class AndroidApplication extends Application{
         if (result){
             new MyThread().start();
         }
-      //  _initData();
+       _initData();
     }
 
+    /**
+     * 在创建自己的资源文件(资源的合并)之前先要替换资源（插件中的资源文件）
+     */
     private void _initData() {
         try{
-            //创建我们自己的Resource
-            String apkPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/app-release.apk";
             assetManager = AssetManager.class.newInstance();
             Method addAssetPathMethod = assetManager.getClass().getDeclaredMethod("addAssetPath", String.class);
             addAssetPathMethod.setAccessible(true);
-//            addAssetPathMethod.invoke(assetManager, mPath);
-            addAssetPathMethod.invoke(assetManager, apkPath);
+            addAssetPathMethod.invoke(assetManager, Constats.newPath);
             Method ensureStringBlocks = AssetManager.class.getDeclaredMethod("ensureStringBlocks");
             ensureStringBlocks.setAccessible(true);
             ensureStringBlocks.invoke(assetManager);

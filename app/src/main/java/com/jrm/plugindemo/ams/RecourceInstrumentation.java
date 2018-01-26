@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
  *
  * @author jiangrenming
  * @date 2018/1/24
- * 资源加载器
+ * 资源加载器《指的是插件里的资源》
  */
 
 public class RecourceInstrumentation extends Instrumentation{
