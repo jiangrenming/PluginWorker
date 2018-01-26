@@ -5,13 +5,10 @@ android {
     buildToolsVersion "27.0.2"
 
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 11
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
     buildTypes {
         release {
@@ -23,9 +20,23 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile 'com.android.support:appcompat-v7:26.+'
-    testCompile 'junit:junit:4.12'
 }
+task clearJar(type: Delete) {
+    delete 'build/libs/pluginlibrary.jar'
+    delete 'libs/pluginlibrary.jar'
+}
+//打包任务
+task makeJar(type:org.gradle.api.tasks.bundling.Jar) {
+    //指定生成的jar名
+    baseName 'pluginlibrary'
+    //从哪里打包class文件
+    from('/build/intermediates/classes/release/com/jrm/pluginlibrary')
+    //打包到jar后的目录结构
+    into('com/jrm/pluginlibrary')
+    //去掉不需要打包的目录和文件
+    exclude('BuildConfig.class', 'R.class')
+    //去掉R$开头的文件
+    exclude{ it.name.startsWith('R$');}
+}
+
+makeJar.dependsOn(clearJar, build)

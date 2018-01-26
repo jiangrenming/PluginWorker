@@ -10,17 +10,12 @@ import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.jrm.plugindemo.activity.MainActivity;
-import com.jrm.plugindemo.ams.AmsHookHelper;
-import com.jrm.plugindemo.ams.DexClassLoaderPlugin;
+import com.jrm.plugindemo.activity.ProxyActivity;
 import com.jrm.plugindemo.utils.AssentsCopyToSdCard;
 import com.jrm.plugindemo.utils.Constats;
-
+import com.jrm.pluginlibrary.PluginFactory;
 import java.io.File;
 import java.lang.reflect.Method;
-
-import dalvik.system.DexClassLoader;
 
 /**
  *
@@ -36,6 +31,8 @@ public class AndroidApplication extends Application{
     private Resources.Theme mTheme;
     private  boolean result;
 
+
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
@@ -45,7 +42,6 @@ public class AndroidApplication extends Application{
         if (result){
             new MyThread().start();
         }
-       _initData();
     }
 
     /**
@@ -99,19 +95,14 @@ public class AndroidApplication extends Application{
         public void run() {
             try{
                 if (result){
-                    //加载资源文件
-                    AmsHookHelper.hookActivityResource(mContext);
-                    //宿主应用的路径
-                    String cachePath = getCacheDir().getAbsolutePath();
-                    //利用DexClassLoader来加载插件
-                    DexClassLoader dexClassLoader = new DexClassLoader(Constats.newPath,cachePath,cachePath,getClassLoader());
-                    DexClassLoaderPlugin.inject(dexClassLoader);
-                    //获取ams代理对象，并给代理对象找替身重新赋值
-                    AmsHookHelper.insteadOfAmsNativeActivity();
-                    //将原有的替身给更换回来
-                    AmsHookHelper.changeRealPluginActivity();
-                    //加载广播
-                    AmsHookHelper.preLoadReceiver(mContext,new File(Constats.newPath),dexClassLoader);
+                   _initData();
+                    PluginFactory build = new PluginFactory.Builder()
+                            .setContext(mContext)  //上下文
+                            .setPath(Constats.newPath)  //apk存储的位置，这里存在sd卡里
+                            .setPluginPackageName(mContext.getPackageName())   //如果在插件里，就输入插件里的包名 ，反之为宿主包名
+                            .setProxyActivity(ProxyActivity.class.getName())   //替身的activity
+                            .build();
+                    build.setConfigParams();  //开始加载插件
                     mHandler.sendEmptyMessage(0x01);
                 }
             }catch (Exception e){

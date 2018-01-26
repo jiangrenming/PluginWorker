@@ -1,11 +1,8 @@
 package com.jrm.plugindemo.activity;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,12 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 import com.jrm.plugindemo.R;
-import com.jrm.plugindemo.ams.AmsHookHelper;
-import com.jrm.plugindemo.ams.DexClassLoaderPlugin;
 import com.jrm.plugindemo.utils.AssentsCopyToSdCard;
-
-import java.lang.reflect.Method;
-import dalvik.system.DexClassLoader;
 
 /**
  *
@@ -94,7 +86,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 boolean result = AssentsCopyToSdCard.copyFilesFassets(WelcomeActivity.this, oldPath, newPath);
                 if (result){
                     //宿主应用的路径
-                    String cachePath = WelcomeActivity.this.getCacheDir().getAbsolutePath();
+                   /* String cachePath = WelcomeActivity.this.getCacheDir().getAbsolutePath();
                     //利用DexClassLoader来加载插件
                     DexClassLoader dexClassLoader = new DexClassLoader(newPath,cachePath,cachePath,getClassLoader());
                     DexClassLoaderPlugin.inject(dexClassLoader);
@@ -110,7 +102,7 @@ public class WelcomeActivity extends AppCompatActivity {
                             Toast.makeText(WelcomeActivity.this,"加载插件成功",Toast.LENGTH_SHORT).show();
                             //startActivity(new Intent(WelcomeActivity.this,MainActivity.class));
                         }
-                    });
+                    });*/
                 }
             }catch (Exception e){
                 e.printStackTrace();
