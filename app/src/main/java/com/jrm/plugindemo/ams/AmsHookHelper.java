@@ -1,16 +1,25 @@
 package com.jrm.plugindemo.ams;
 
 import android.app.Instrumentation;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static android.content.ContentValues.TAG;
 
 /**
  *
@@ -144,4 +153,56 @@ public class AmsHookHelper {
         }
     }
 
+    public static Map<ActivityInfo, List<? extends IntentFilter>> sCache = new HashMap<ActivityInfo, List<? extends IntentFilter>>();
+
+    /**
+     *获取所有的静态广播
+     */
+    public  static  void parseReceivers(File apkFile) throws  Exception{
+
+        Class<?> aClass = Class.forName("android.content.pm.PackageParser");
+        Method parsePackageMethod = aClass.getDeclaredMethod("parsePackage", File.class, int.class);
+        parsePackageMethod.setAccessible(true);
+        Object packageParser  = aClass.newInstance();
+        //通过parsePackageMethod获取apk里Package对象
+        Object packageObj = parsePackageMethod.invoke(packageParser, apkFile, PackageManager.GET_RECEIVERS);
+        //读取package对象里的receiver字段信息为获取List<Activity> ,底层就是把receiver与activity一样处理的
+         Field receiversFields = packageObj.getClass().getDeclaredField("receivers");
+         List receivers = (List) receiversFields.get(packageObj);
+        Class<?> packagePares$Activity = Class.forName("android.content.pm.PackageParser$Activity");
+        Class<?> packageUserStateClass = Class.forName("android.content.pm.PackageUserState");
+        Class<?> userHandler = Class.forName("android.os.UserHandle");
+        Method getCallingUserIdMethod = userHandler.getDeclaredMethod("getCallingUserId");
+        int userId = (Integer) getCallingUserIdMethod.invoke(null);
+        Object defaultUserState = packageUserStateClass.newInstance();
+        Class<?> componentClass = Class.forName("android.content.pm.PackageParser$Component");
+        Field intentsField = componentClass.getDeclaredField("intents");
+        // 需要调用 android.content.pm.PackageParser#generateActivityInfo(android.content.pm.ActivityInfo, int, android.content.pm.PackageUserState, int)
+        Method generateReceiverInfo = aClass.getDeclaredMethod("generateActivityInfo", packagePares$Activity, int.class, packageUserStateClass, int.class);
+        // 解析出 receiver以及对应的 intentFilter
+        for (Object receiver : receivers) {
+            ActivityInfo info = (ActivityInfo) generateReceiverInfo.invoke(packageParser, receiver, 0, defaultUserState, userId);
+            List<? extends IntentFilter> filters = (List<? extends IntentFilter>) intentsField.get(receiver);
+            sCache.put(info, filters);
+        }
+    }
+
+    /**
+     * 把所有静态注册的广播重新注册为动态广播
+     * @param context
+     * @param apk
+     * @throws Exception
+     */
+    public static void preLoadReceiver(Context context, File apk,ClassLoader cl) throws Exception {
+        parseReceivers(apk);
+        for (ActivityInfo activityInfo : sCache.keySet()) {
+            Log.i(TAG, "preload receiver:" + activityInfo.name);
+            List<? extends IntentFilter> intentFilters = sCache.get(activityInfo);
+            // 把解析出来的每一个静态Receiver都注册为动态的
+            for (IntentFilter intentFilter : intentFilters) {
+                BroadcastReceiver receiver = (BroadcastReceiver) cl.loadClass(activityInfo.name).newInstance();
+                context.registerReceiver(receiver, intentFilter);
+            }
+        }
+    }
 }

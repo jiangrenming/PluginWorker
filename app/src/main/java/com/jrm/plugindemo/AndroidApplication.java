@@ -17,6 +17,7 @@ import com.jrm.plugindemo.ams.DexClassLoaderPlugin;
 import com.jrm.plugindemo.utils.AssentsCopyToSdCard;
 import com.jrm.plugindemo.utils.Constats;
 
+import java.io.File;
 import java.lang.reflect.Method;
 
 import dalvik.system.DexClassLoader;
@@ -109,6 +110,8 @@ public class AndroidApplication extends Application{
                     AmsHookHelper.insteadOfAmsNativeActivity();
                     //将原有的替身给更换回来
                     AmsHookHelper.changeRealPluginActivity();
+                    //加载广播
+                    AmsHookHelper.preLoadReceiver(mContext,new File(Constats.newPath),dexClassLoader);
                     mHandler.sendEmptyMessage(0x01);
                 }
             }catch (Exception e){

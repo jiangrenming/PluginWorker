@@ -3,9 +3,11 @@ package com.jrm.plugindemo.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import com.jrm.plugindemo.ams.DexClassLoaderPlugin;
 import com.jrm.plugindemo.utils.AssentsCopyToSdCard;
 import com.jrm.plugindemo.utils.Constats;
 
+import java.io.File;
 import java.util.Map;
 
 import dalvik.system.DexClassLoader;
@@ -33,6 +36,8 @@ import dalvik.system.DexClassLoader;
  */
 public class MainActivity extends Activity {
 
+    static final String ACTION = "com.weishu.upf.demo.app2.PLUGIN_ACTION";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,15 +45,30 @@ public class MainActivity extends Activity {
         findViewById(R.id.btn_skip).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try{
+                try {
                     Intent intent = new Intent();
-                    intent.setComponent(new ComponentName("com.jrm.plugin","com.jrm.plugin.StartActivity"));
+                    intent.setComponent(new ComponentName("com.jrm.plugin", "com.jrm.plugin.StartActivity"));
                     startActivity(intent);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
+        //广播插件的使用
+        findViewById(R.id.receiver).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendBroadcast(new Intent("com.jrm.plugin.TestReceiver"));
+            }
+        });
+        registerReceiver(mReceiver, new IntentFilter(ACTION));
     }
+
+    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(context, "插件插件,我是宿主,我已经接收你的请求了!", Toast.LENGTH_SHORT).show();
+        }
+    };
 
 }

@@ -7,7 +7,12 @@
     <Button
         android:id="@+id/btn_skip"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="50dp"
         android:textColor="@color/colorAccent"
         android:text="跳转插件" />
+    <Button
+        android:id="@+id/receiver"
+        android:text="广播插件"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
 </LinearLayout>
