@@ -3,10 +3,12 @@ package com.jrm.pluginlibrary.ams;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
@@ -32,7 +34,7 @@ public class AmsHookHelper {
 
 
     public static  final String EXTRA_TARGET_INTENT = "extra_target_intent";
-
+    public static  final String EXTRA_TARGET_INTENT_SERVICE = "extra_target_intent_service";
 
     /**
      * ams获取代理对象并替换真身
@@ -153,11 +155,11 @@ public class AmsHookHelper {
         }
     }
 
-    public static Map<ActivityInfo, List<? extends IntentFilter>> sCache = new HashMap<ActivityInfo, List<? extends IntentFilter>>();
 
     /**
      *获取所有的静态广播
      */
+    public static Map<ActivityInfo, List<? extends IntentFilter>> sCache = new HashMap<ActivityInfo, List<? extends IntentFilter>>();
     public  static  void parseReceivers(File apkFile) throws  Exception{
 
         Class<?> aClass = Class.forName("android.content.pm.PackageParser");
@@ -204,4 +206,37 @@ public class AmsHookHelper {
             }
         }
     }
+
+
+    /**
+     * 插件获取apk包里的所有的service，并存储
+     */
+    public static  Map<ComponentName, ServiceInfo> mServiceInfoMap = new HashMap<ComponentName, ServiceInfo>();
+    public  static  void preLoadService(File apk) throws Exception{
+        Class<?> packageParserClass = Class.forName("android.content.pm.PackageParser");
+        Method parsePackageMethod = packageParserClass.getDeclaredMethod("parsePackage", File.class, int.class);
+        Object packageParser = packageParserClass.newInstance();
+        // 首先调用parsePackage获取到apk对象对应的Package对象
+        Object packageObj = parsePackageMethod.invoke(packageParser, apk, PackageManager.GET_SERVICES);
+        // 读取Package对象里面的services字段
+        // 接下来要做的就是根据这个List<Service> 获取到Service对应的ServiceInfo
+        Field servicesField = packageObj.getClass().getDeclaredField("services");
+        List services = (List) servicesField.get(packageObj);
+        // 调用generateServiceInfo 方法, 把PackageParser.Service转换成ServiceInfo
+        Class<?> packageParser$ServiceClass = Class.forName("android.content.pm.PackageParser$Service");
+        Class<?> packageUserStateClass = Class.forName("android.content.pm.PackageUserState");
+        Class<?> userHandler = Class.forName("android.os.UserHandle");
+        Method getCallingUserIdMethod = userHandler.getDeclaredMethod("getCallingUserId");
+        int userId = (Integer) getCallingUserIdMethod.invoke(null);
+        Object defaultUserState = packageUserStateClass.newInstance();
+        // 需要调用 android.content.pm.PackageParser#generateActivityInfo(android.content.pm.ActivityInfo, int, android.content.pm.PackageUserState, int)
+        Method generateReceiverInfo = packageParserClass.getDeclaredMethod("generateServiceInfo",
+                packageParser$ServiceClass, int.class, packageUserStateClass, int.class);
+        // 解析出intent对应的Service组件
+        for (Object service : services) {
+            ServiceInfo info = (ServiceInfo) generateReceiverInfo.invoke(packageParser, service, 0, defaultUserState, userId);
+            mServiceInfoMap.put(new ComponentName(info.packageName, info.name), info);
+        }
+    }
+
 }

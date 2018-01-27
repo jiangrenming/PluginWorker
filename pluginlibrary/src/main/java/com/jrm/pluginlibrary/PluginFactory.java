@@ -23,10 +23,11 @@ import dalvik.system.DexClassLoader;
 
 public class PluginFactory {
 
-    private  static String clsName;
+    private  static String clsActivityName;
     private static  String pkgeName;
     private  static Context mContext;
     private  static   String path;
+    private  static  String clsServiceName;
 
     private  PluginFactory () throws  Exception{
     }
@@ -43,8 +44,8 @@ public class PluginFactory {
             return config;
         }
 
-        public Builder setProxyActivity(String className) {
-            clsName = className;
+        public Builder setProxyActivity(String classActivityName) {
+            clsActivityName = classActivityName;
             return this;
         }
         public Builder setPluginPackageName(String packageName) {
@@ -60,6 +61,11 @@ public class PluginFactory {
             path = apkPath;
             return this;
         }
+        public Builder setServiceName(String serviceName) {
+            clsServiceName = serviceName;
+            return this;
+        }
+
     }
    public  void setConfigParams() throws Exception{
        //加载资源文件
@@ -69,20 +75,27 @@ public class PluginFactory {
        //利用DexClassLoader来加载插件
        DexClassLoader dexClassLoader = new DexClassLoader(path,cachePath,cachePath,mContext.getClassLoader());
        DexClassLoaderPlugin.inject(dexClassLoader);
-       //获取ams代理对象，并给代理对象找替身重新赋值
+       //拦截操作，获取ams代理对象，并给代理对象找替身重新赋值
        AmsHookHelper.insteadOfAmsNativeActivity();
        //将原有的替身给更换回来
        AmsHookHelper.changeRealPluginActivity();
        //加载广播
        AmsHookHelper.preLoadReceiver(new File(path),dexClassLoader);
+       //加载插件中的service
+       AmsHookHelper.preLoadService(new File(path));
+
    }
 
     public static  String getPackageName() {
         return pkgeName;
     }
 
-    public static String getClassName() {
-        return clsName;
+    public static String getClsActivityName() {
+        return clsActivityName;
+    }
+
+    public static String getClsServiceName() {
+        return clsServiceName;
     }
 
     public static Context getmContext() {

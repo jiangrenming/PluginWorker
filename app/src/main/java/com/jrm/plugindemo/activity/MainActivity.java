@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.jrm.plugindemo.R;
 
@@ -59,4 +60,7 @@ public class MainActivity extends Activity {
         super.onDestroy();
         unregisterReceiver(mReceiver);
     }
+
+
+
 }
