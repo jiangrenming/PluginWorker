@@ -11,6 +11,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
 import com.jrm.plugindemo.activity.ProxyActivity;
+import com.jrm.plugindemo.service.ProxyService;
 import com.jrm.plugindemo.utils.AssentsCopyToSdCard;
 import com.jrm.plugindemo.utils.Constats;
 import com.jrm.pluginlibrary.PluginFactory;
@@ -101,6 +102,7 @@ public class AndroidApplication extends Application{
                             .setPath(Constats.newPath)  //apk存储的位置，这里存在sd卡里
                             .setPluginPackageName(mContext.getPackageName())   //如果在插件里，就输入插件里的包名 ，反之为宿主包名
                             .setProxyActivity(ProxyActivity.class.getName())   //替身的activity
+                            .setServiceName(ProxyService.class.getName())      //替身service
                             .build();
                     build.setConfigParams();  //开始加载插件
                     mHandler.sendEmptyMessage(0x01);

@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
+import android.util.Log;
+
+import com.jrm.pluginlibrary.ams.ServiceManager;
 
 /**
  *
@@ -23,6 +26,9 @@ public class ProxyService extends Service{
 
     @Override
     public void onStart(Intent intent, int startId) {
+        Log.d("TAG", "onStart() called with " + "intent = [" + intent + "], startId = [" + startId + "]");
+        //service的分发操作
+        ServiceManager.getInstance().onStart(intent, startId);
         super.onStart(intent, startId);
     }
 

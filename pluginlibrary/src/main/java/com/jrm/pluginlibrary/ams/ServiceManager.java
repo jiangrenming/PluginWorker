@@ -41,6 +41,7 @@ public class ServiceManager {
      */
     public void onStart(Intent proxyIntent, int startId) {
         Intent targetIntent = proxyIntent.getParcelableExtra(AmsHookHelper.EXTRA_TARGET_INTENT_SERVICE);
+        Log.i("service的长度",targetIntent+"");
         ServiceInfo serviceInfo = selectPluginService(targetIntent);
         if (serviceInfo == null) {
             Log.w("启动插件service", "can not found service : " + targetIntent.getComponent());
@@ -138,6 +139,7 @@ public class ServiceManager {
      * @return
      */
     private ServiceInfo selectPluginService(Intent pluginIntent) {
+        Log.i("service的长度",AmsHookHelper.mServiceInfoMap.size()+"");
         for (ComponentName componentName : AmsHookHelper.mServiceInfoMap.keySet()) {
             if (componentName.equals(pluginIntent.getComponent())) {
                 return AmsHookHelper.mServiceInfoMap.get(componentName);
@@ -145,6 +147,4 @@ public class ServiceManager {
         }
         return null;
     }
-
-
 }

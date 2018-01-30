@@ -46,6 +46,20 @@ public class MainActivity extends Activity {
             }
         });
         registerReceiver(mReceiver, new IntentFilter(ACTION));
+        //启动服务插件的使用
+        findViewById(R.id.start_service).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startService(new Intent().setComponent(new ComponentName("com.jrm.plugin","com.jrm.plugin.TestService")));
+            }
+        });
+        //停止服务插件的使用
+        findViewById(R.id.stop_service).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopService(new Intent().setComponent(new ComponentName("com.jrm.plugin","com.jrm.plugin.TestService")));
+            }
+        });
     }
 
     BroadcastReceiver mReceiver = new BroadcastReceiver() {

@@ -233,6 +233,7 @@ public class AmsHookHelper {
         Method generateReceiverInfo = packageParserClass.getDeclaredMethod("generateServiceInfo",
                 packageParser$ServiceClass, int.class, packageUserStateClass, int.class);
         // 解析出intent对应的Service组件
+        Log.i("获取插件中service的长度",services.size()+"");
         for (Object service : services) {
             ServiceInfo info = (ServiceInfo) generateReceiverInfo.invoke(packageParser, service, 0, defaultUserState, userId);
             mServiceInfoMap.put(new ComponentName(info.packageName, info.name), info);

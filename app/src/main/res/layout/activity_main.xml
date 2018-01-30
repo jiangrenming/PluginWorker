@@ -15,4 +15,15 @@
         android:text="广播插件"
         android:layout_width="match_parent"
         android:layout_height="50dp" />
+
+    <Button
+        android:id="@+id/start_service"
+        android:text="启动服务插件"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+    <Button
+        android:id="@+id/stop_service"
+        android:text="停止服务插件"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
 </LinearLayout>
