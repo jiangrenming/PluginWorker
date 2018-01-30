@@ -1,0 +1,32 @@
+git账号：
+  http://192.168.10.9:10101/
+ 账号： jiangrm  密码：jiangrm123
+
+
+公司邮箱
+  账号：jiangrm@newlandcomputer.com
+  密码：??!!gundan10086
+
+
+confluence账号和密码
+
+ 全名：姜仁明
+ 邮箱：jiangrm@newlandcomputer.com
+ 密码：gundan10086
+ 用户名:jiangrm
+
+
+ 公司OA账户
+
+ 用户名:jiangrm
+ 密码:??!!gundan10086
+
+ jira账号
+
+ 账号:jiangrm
+ 密码:gun
+dan10086
+
+收单测试环境后台地址：
+https://51starpos.com:8180/portal/index
+账号：test66 密码:12345678
