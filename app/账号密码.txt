@@ -30,3 +30,17 @@ dan10086
 收单测试环境后台地址：
 https://51starpos.com:8180/portal/index
 账号：test66 密码:12345678
+
+个人服务器的账户:
+ 购买地址：https://clients.hostmybytes.com/cart.php?a=complete
+ 账户:jiangrenming 密码:??!!gundan10086
+ hostserver:jrmlovewy.admin.com
+username:hmb6220
+password:3a8c2b13ec
+ip地址：139.226.100.26
+
+
+192.168.10.88
+255.255.255.0
+192.168.10.254
+223.5.5.5
